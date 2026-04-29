@@ -82,42 +82,87 @@ form.addEventListener('submit', async (e) => {
     progressBar.style.display = 'block';
     progressFill.style.width = '0%';
     submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Отправка...';
+    submitBtn.textContent = '⏳ Анализируем...';
 
     let width = 0;
     const interval = setInterval(() => {
-        if (width >= 90) clearInterval(interval);
-        else {
-            width += 10;
+        width += 7;
+        if (width >= 100) {
+            width = 100;
+            clearInterval(interval);
+            progressFill.style.width = '100%';
+            // Показываем результат с wow-эффектом
+            showResult();
+        } else {
             progressFill.style.width = width + '%';
         }
-    }, 100);
+    }, 80);
 
-    // Заново читаем значения полей, чтобы избежать проблем с областью видимости
-    const name = form.name.value.trim();
-    const phone = form.phone.value.trim();
+    // Определяем тип трейдера локально (та же логика, что в боте)
+    function getType() {
+        const exp = form.experience.value;
+        const style = form.trading_style.value;
+        const goal = form.goal.value;
+        const risk = form.risk_level.value;
 
-    const formData = {
-        experience: form.experience.value,
-        trading_style: form.trading_style.value,
-        goal: form.goal.value,
-        risk_level: form.risk_level.value,
-        name: name,
-        phone: phone
+        if (exp === 'beginner') {
+            return style === 'scalping' ? 'Активный новичок' : 'Осторожный старт';
+        } else if (exp === 'intermediate') {
+            return risk === 'high' ? 'Агрессивный трейдер' : 'Сбалансированный трейдер';
+        } else {
+            return goal === 'income' ? 'Профессионал' : 'Инвестор';
+        }
+    }
+
+    const recommendations = {
+        'Активный новичок': 'Рекомендуем начать с демо-счета и изучить основы риск-менеджмента.',
+        'Осторожный старт': 'Вам подойдут долгосрочные стратегии с низким риском.',
+        'Агрессивный трейдер': 'Рассмотрите возможности маржинальной торговли и хеджирования.',
+        'Сбалансированный трейдер': 'Продолжайте в том же духе! Возможно, стоит попробовать алгоритмическую торговлю.',
+        'Профессионал': 'Отлично! Предлагаем вам доступ к нашей VIP-группе с сигналами.',
+        'Инвестор': 'Вам подойдут портфельные инвестиции с горизонтом от 1 года.'
     };
 
-    try {
-        tg.sendData(JSON.stringify(formData));
-        clearInterval(interval);
-        progressFill.style.width = '100%';
-        setTimeout(() => tg.close(), 1500);
-    } catch (err) {
-        console.error(err);
-        clearInterval(interval);
+    const icons = {
+        'Активный новичок': '🚀',
+        'Осторожный старт': '🐢',
+        'Агрессивный трейдер': '🔥',
+        'Сбалансированный трейдер': '⚖️',
+        'Профессионал': '🏆',
+        'Инвестор': '💼'
+    };
+
+    function showResult() {
+        const type = getType();
+        document.getElementById('resultType').textContent = type;
+        document.getElementById('resultRecommendation').textContent = recommendations[type] || '';
+        document.getElementById('resultIcon').textContent = icons[type] || '📊';
+
+        // Скрываем форму и показываем карточку
+        form.style.display = 'none';
+        document.getElementById('resultCard').style.display = 'block';
         progressBar.style.display = 'none';
-        errorDiv.textContent = 'Ошибка отправки. Попробуйте позже.';
-        errorDiv.style.display = 'block';
-        submitBtn.disabled = false;
-        submitBtn.textContent = '✅ Узнать результат';
+
+        // Отправляем данные на бэкенд в фоне
+        const name = form.name.value.trim();
+        const phone = form.phone.value.trim();
+        const formData = {
+            experience: form.experience.value,
+            trading_style: form.trading_style.value,
+            goal: form.goal.value,
+            risk_level: form.risk_level.value,
+            name: name,
+            phone: phone
+        };
+        try {
+            tg.sendData(JSON.stringify(formData));
+        } catch (err) {
+            console.error(err);
+        }
+
+        // Закрываем Mini App через 10 секунд, чтобы пользователь успел сделать скриншот
+        setTimeout(() => {
+            tg.close();
+        }, 10000);
     }
 });
