@@ -30,7 +30,7 @@ document.querySelectorAll('.prev-btn').forEach(btn => {
 });
 showStep(1);
 
-// Сохранение в localStorage (по желанию)
+// Сохранение в localStorage
 function saveFormData() {
     const data = {
         experience: form.experience.value,
@@ -92,6 +92,10 @@ form.addEventListener('submit', async (e) => {
             progressFill.style.width = width + '%';
         }
     }, 100);
+
+    // Заново читаем значения полей, чтобы избежать проблем с областью видимости
+    const name = form.name.value.trim();
+    const phone = form.phone.value.trim();
 
     const formData = {
         experience: form.experience.value,
