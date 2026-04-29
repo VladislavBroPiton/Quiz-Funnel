@@ -190,7 +190,7 @@ async def main():
     await site.start()
     logger.info(f"✅ Веб-сервер запущен на порту {port}")
 
-    webhook_url = f"https://quiz-forex-bot.onrender.com/webhook"
+    webhook_url = f"https://quiz-funnel-bot.onrender.com/webhook"
     await bot.set_webhook(url=webhook_url)
     logger.info(f"✅ Вебхук установлен: {webhook_url}")
 
