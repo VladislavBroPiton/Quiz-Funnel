@@ -92,7 +92,10 @@ function saveFormData() {
     document.querySelectorAll('.options-grid').forEach(grid => {
         const name = grid.getAttribute('data-name');
         const selected = grid.querySelector('.option-card.selected');
-        if (selected) data[name] = selected.getAttribute('data-value');
+        if (selected) {
+            data[name] = selected.getAttribute('data-value');
+            if (form[name]) form[name].value = selected.getAttribute('data-value');
+        }
     });
     data.name = form.name.value;
     data.phone = form.phone.value;
