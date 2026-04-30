@@ -31,13 +31,6 @@ document.querySelectorAll('.prev-btn').forEach(btn => {
 });
 showStep(1);
 
-// Кнопка закрытия карточки результата (один раз за всё время)
-if (closeResultBtn) {
-    closeResultBtn.addEventListener('click', () => {
-        tg.close();
-    });
-}
-
 // Сохранение в localStorage
 function saveFormData() {
     const data = {
@@ -140,6 +133,9 @@ form.addEventListener('submit', async (e) => {
         'Инвестор': '💼'
     };
 
+    // Данные для отправки (сохраним в глобальную переменную, чтобы использовать позже)
+    let pendingFormData = null;
+
     function showResult() {
         const type = getType();
         document.getElementById('resultType').textContent = type;
@@ -151,10 +147,10 @@ form.addEventListener('submit', async (e) => {
         document.getElementById('resultCard').style.display = 'block';
         progressBar.style.display = 'none';
 
-        // Отправляем данные на бэкенд в фоне
+        // Подготавливаем данные, но НЕ отправляем их сейчас
         const name = form.name.value.trim();
         const phone = form.phone.value.trim();
-        const formData = {
+        pendingFormData = {
             experience: form.experience.value,
             trading_style: form.trading_style.value,
             goal: form.goal.value,
@@ -162,12 +158,19 @@ form.addEventListener('submit', async (e) => {
             name: name,
             phone: phone
         };
-        try {
-            tg.sendData(JSON.stringify(formData));
-        } catch (err) {
-            console.error(err);
-        }
+    }
 
-        // НЕ ЗАКРЫВАЕМ автоматически, пользователь сам нажмёт кнопку "Понятно, закрыть"
+    // Кнопка "Понятно, закрыть" теперь отправляет данные и закрывает приложение
+    if (closeResultBtn) {
+        closeResultBtn.addEventListener('click', () => {
+            if (pendingFormData) {
+                try {
+                    tg.sendData(JSON.stringify(pendingFormData));
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            tg.close();
+        });
     }
 });
