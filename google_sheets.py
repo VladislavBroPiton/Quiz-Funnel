@@ -9,7 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 logger = logging.getLogger(__name__)
 
 SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID", "ваш_дефолтный_sheet_id")
-WORKSHEET_NAME = "Sheet1"   # можешь поменять на любое удобное имя
+WORKSHEET_NAME = "Quiz"   # можешь поменять на любое удобное имя
 
 def _get_google_client():
     creds_json = os.getenv("GOOGLE_SHEETS_KEY")
