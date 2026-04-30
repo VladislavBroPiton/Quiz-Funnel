@@ -24,7 +24,40 @@ function showStep(step) {
     steps.forEach((s, idx) => s.classList.toggle('active', idx === step - 1));
     currentStep = step;
     updateProgressSteps(step);
+    updateNextButton();
 }
+
+function updateNextButton() {
+    const activeStep = document.querySelector('.step.active');
+    if (!activeStep) return;
+    const nextBtn = activeStep.querySelector('.next-btn');
+    if (!nextBtn) return;
+    const grid = activeStep.querySelector('.options-grid');
+    if (grid) {
+        const name = grid.getAttribute('data-name');
+        const selected = grid.querySelector('.option-card.selected');
+        nextBtn.disabled = !selected;
+        if (selected && name) {
+            form[name].value = selected.getAttribute('data-value');
+        }
+    }
+}
+
+// Обработка выбора карточек
+document.querySelectorAll('.options-grid').forEach(grid => {
+    grid.addEventListener('click', (e) => {
+        const card = e.target.closest('.option-card');
+        if (!card) return;
+        grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        const name = grid.getAttribute('data-name');
+        if (name) {
+            form[name].value = card.getAttribute('data-value');
+        }
+        updateNextButton();
+        saveFormData();
+    });
+});
 
 document.querySelectorAll('.next-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -54,33 +87,15 @@ document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
 });
 document.addEventListener('click', () => tooltipPopup.classList.remove('visible'));
 
-// Параллакс
-const labels = document.querySelectorAll('label');
-document.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 10;
-    const y = (e.clientY / window.innerHeight - 0.5) * 10;
-    labels.forEach(label => {
-        const emoji = label.querySelector('span.tooltip-trigger')?.previousSibling;
-        if (emoji && emoji.nodeType === 3 && emoji.textContent.trim()) {
-            const span = document.createElement('span');
-            span.textContent = emoji.textContent;
-            span.style.display = 'inline-block';
-            span.style.transform = `translate(${x}px, ${y}px)`;
-            span.style.transition = 'transform 0.1s ease-out';
-            emoji.replaceWith(span);
-        }
-    });
-});
-
 function saveFormData() {
-    const data = {
-        experience: form.experience.value,
-        trading_style: form.trading_style.value,
-        goal: form.goal.value,
-        risk_level: form.risk_level.value,
-        name: form.name.value,
-        phone: form.phone.value
-    };
+    const data = {};
+    document.querySelectorAll('.options-grid').forEach(grid => {
+        const name = grid.getAttribute('data-name');
+        const selected = grid.querySelector('.option-card.selected');
+        if (selected) data[name] = selected.getAttribute('data-value');
+    });
+    data.name = form.name.value;
+    data.phone = form.phone.value;
     localStorage.setItem('quiz_form', JSON.stringify(data));
 }
 
@@ -88,12 +103,19 @@ function loadSavedData() {
     const saved = localStorage.getItem('quiz_form');
     if (saved) {
         const data = JSON.parse(saved);
-        form.experience.value = data.experience || 'beginner';
-        form.trading_style.value = data.trading_style || 'day_trading';
-        form.goal.value = data.goal || 'income';
-        form.risk_level.value = data.risk_level || 'low';
+        document.querySelectorAll('.options-grid').forEach(grid => {
+            const name = grid.getAttribute('data-name');
+            if (data[name]) {
+                const card = grid.querySelector(`.option-card[data-value="${data[name]}"]`);
+                if (card) {
+                    grid.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                }
+            }
+        });
         form.name.value = data.name || '';
         form.phone.value = data.phone || '';
+        updateNextButton();
     }
 }
 loadSavedData();
