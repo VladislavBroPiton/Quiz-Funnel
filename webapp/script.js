@@ -141,6 +141,9 @@ form.addEventListener('submit', async (e) => {
         // Скрываем форму и показываем карточку
         form.style.display = 'none';
         document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('closeResultBtn').addEventListener('click', () => {
+    tg.close();
+});
         progressBar.style.display = 'none';
 
         // Отправляем данные на бэкенд в фоне
