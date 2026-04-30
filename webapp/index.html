@@ -14,6 +14,10 @@
         <div class="logo">
             <img src="/webapp/static/logo.png" alt="Quiz Trader" style="width:48px;height:48px;border-radius:50%">
             <h1>Quiz Trader</h1>
+            <!-- Кнопка переключения темы -->
+            <button id="themeToggle" class="theme-toggle" title="Переключить тему">
+                <span class="theme-icon">🌙</span>
+            </button>
         </div>
         <div class="subtitle">УЗНАЙ СВОЙ ПРОФИЛЬ ТРЕЙДЕРА</div>
 
@@ -154,16 +158,19 @@
                     <button type="submit" id="submitBtn">✅ Узнать результат</button>
                 </div>
             </div>
-        <input type="hidden" name="experience" value="beginner">
-        <input type="hidden" name="trading_style" value="day_trading">
-        <input type="hidden" name="goal" value="income">
-        <input type="hidden" name="risk_level" value="low">
-    </form>
+
+            <input type="hidden" name="experience" value="beginner">
+            <input type="hidden" name="trading_style" value="day_trading">
+            <input type="hidden" name="goal" value="income">
+            <input type="hidden" name="risk_level" value="low">
+        </form>
 
         <div id="resultCard" class="result-card" style="display:none;">
             <div class="result-icon" id="resultIcon"><span class="icon-animated">📊</span></div>
             <h2 id="resultType"></h2>
             <p id="resultRecommendation"></p>
+            <!-- Детальные советы будут добавлены через JS -->
+            <div id="detailedAdvice" style="margin-top: 20px; text-align: left;"></div>
             <button id="closeResultBtn" style="margin-top: 24px; width: auto; padding: 12px 28px;">✅ Понятно, закрыть</button>
         </div>
 
