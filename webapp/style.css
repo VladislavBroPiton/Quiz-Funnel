@@ -12,6 +12,19 @@
     --success: #00ffaa;
 }
 
+/* Светлая тема */
+[data-theme="light"] {
+    --bg-dark: #f5f7fa;
+    --surface-glass: rgba(255, 255, 255, 0.7);
+    --surface-solid: #ffffff;
+    --text: #1a1a2e;
+    --text-dim: #4a4a60;
+    --accent: #0066ff;
+    --accent-2: #8a2be2;
+    --accent-glow: rgba(0, 102, 255, 0.15);
+    --border: #e0e4ea;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
@@ -22,6 +35,7 @@ body {
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 body::before {
@@ -55,6 +69,7 @@ body::before {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 240, 255, 0.1);
     position: relative;
     z-index: 2;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .logo {
@@ -73,6 +88,25 @@ h1 {
     color: var(--text-dim); margin-bottom: 20px; font-size: 14px;
     border-left: 3px solid var(--accent); padding-left: 14px;
     font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* Кнопка переключения темы */
+.theme-toggle {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+.theme-toggle:hover {
+    background: rgba(255,255,255,0.1);
 }
 
 .progress-steps {
@@ -256,6 +290,19 @@ button:disabled { opacity: 0.4; pointer-events: none; }
     margin-bottom: 12px;
 }
 .result-card p { color: var(--text-dim); font-size: 16px; line-height: 1.6; }
+
+/* Детальные советы */
+.advice-item {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    color: var(--text-dim);
+    font-size: 14px;
+    text-align: left;
+}
+.advice-item span { margin-right: 6px; }
 
 @keyframes resultAppear {
     from { opacity: 0; transform: scale(0.8) translateY(30px); filter: blur(10px); }
