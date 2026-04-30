@@ -17,7 +17,6 @@
         </div>
         <div class="subtitle">УЗНАЙ СВОЙ ПРОФИЛЬ ТРЕЙДЕРА</div>
 
-        <!-- Индикатор шагов -->
         <div class="progress-steps" id="progressSteps">
             <span class="progress-step active" data-step="1"></span>
             <span class="progress-step" data-step="2"></span>
@@ -31,14 +30,26 @@
             <div class="step step-1 active">
                 <div class="form-group">
                     <label>📈 Ваш опыт в трейдинге <span class="tooltip-trigger" data-tooltip="Выберите, насколько вы знакомы с рынком">?</span></label>
-                    <select name="experience" required>
-                        <option value="beginner">👶 Новичок (меньше года)</option>
-                        <option value="intermediate">🧑 Продвинутый (1-3 года)</option>
-                        <option value="experienced">👴 Профессионал (более 3 лет)</option>
-                    </select>
+                    <div class="options-grid" data-name="experience">
+                        <div class="option-card" data-value="beginner">
+                            <span class="option-icon">👶</span>
+                            <span class="option-title">Новичок</span>
+                            <span class="option-desc">Меньше года</span>
+                        </div>
+                        <div class="option-card" data-value="intermediate">
+                            <span class="option-icon">🧑</span>
+                            <span class="option-title">Продвинутый</span>
+                            <span class="option-desc">1–3 года</span>
+                        </div>
+                        <div class="option-card" data-value="experienced">
+                            <span class="option-icon">👴</span>
+                            <span class="option-title">Профессионал</span>
+                            <span class="option-desc">Более 3 лет</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="step-buttons">
-                    <button type="button" class="next-btn">Далее →</button>
+                    <button type="button" class="next-btn" disabled>Далее →</button>
                 </div>
             </div>
 
@@ -46,16 +57,32 @@
             <div class="step step-2">
                 <div class="form-group">
                     <label>⚡ Предпочитаемый стиль <span class="tooltip-trigger" data-tooltip="Стиль определяет, как часто вы открываете сделки">?</span></label>
-                    <select name="trading_style" required>
-                        <option value="scalping">Скальпинг (быстрые сделки)</option>
-                        <option value="day_trading">Дейтрейдинг (внутри дня)</option>
-                        <option value="swing">Свинг (недели)</option>
-                        <option value="long_term">Долгосрочные инвестиции</option>
-                    </select>
+                    <div class="options-grid" data-name="trading_style">
+                        <div class="option-card" data-value="scalping">
+                            <span class="option-icon">⚡</span>
+                            <span class="option-title">Скальпинг</span>
+                            <span class="option-desc">Быстрые сделки</span>
+                        </div>
+                        <div class="option-card" data-value="day_trading">
+                            <span class="option-icon">📊</span>
+                            <span class="option-title">Дейтрейдинг</span>
+                            <span class="option-desc">Внутри дня</span>
+                        </div>
+                        <div class="option-card" data-value="swing">
+                            <span class="option-icon">📅</span>
+                            <span class="option-title">Свинг</span>
+                            <span class="option-desc">Недели</span>
+                        </div>
+                        <div class="option-card" data-value="long_term">
+                            <span class="option-icon">🏦</span>
+                            <span class="option-title">Инвестиции</span>
+                            <span class="option-desc">Долгосрочные</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="step-buttons">
                     <button type="button" class="prev-btn">← Назад</button>
-                    <button type="button" class="next-btn">Далее →</button>
+                    <button type="button" class="next-btn" disabled>Далее →</button>
                 </div>
             </div>
 
@@ -63,15 +90,24 @@
             <div class="step step-3">
                 <div class="form-group">
                     <label>🎯 Ваша главная цель <span class="tooltip-trigger" data-tooltip="Чего вы хотите достичь в трейдинге в первую очередь">?</span></label>
-                    <select name="goal" required>
-                        <option value="income">Стабильный доход</option>
-                        <option value="growth">Рост капитала</option>
-                        <option value="speculation">Спекуляция</option>
-                    </select>
+                    <div class="options-grid" data-name="goal">
+                        <div class="option-card" data-value="income">
+                            <span class="option-icon">💰</span>
+                            <span class="option-title">Стабильный доход</span>
+                        </div>
+                        <div class="option-card" data-value="growth">
+                            <span class="option-icon">📈</span>
+                            <span class="option-title">Рост капитала</span>
+                        </div>
+                        <div class="option-card" data-value="speculation">
+                            <span class="option-icon">🎲</span>
+                            <span class="option-title">Спекуляция</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="step-buttons">
                     <button type="button" class="prev-btn">← Назад</button>
-                    <button type="button" class="next-btn">Далее →</button>
+                    <button type="button" class="next-btn" disabled>Далее →</button>
                 </div>
             </div>
 
@@ -79,15 +115,27 @@
             <div class="step step-4">
                 <div class="form-group">
                     <label>⚠️ Допустимый риск на сделку <span class="tooltip-trigger" data-tooltip="Процент капитала, которым вы готовы рискнуть в одной сделке">?</span></label>
-                    <select name="risk_level" required>
-                        <option value="low">До 1%</option>
-                        <option value="medium">1-3%</option>
-                        <option value="high">Более 3%</option>
-                    </select>
+                    <div class="options-grid" data-name="risk_level">
+                        <div class="option-card" data-value="low">
+                            <span class="option-icon">🛡️</span>
+                            <span class="option-title">Консервативный</span>
+                            <span class="option-desc">До 1%</span>
+                        </div>
+                        <div class="option-card" data-value="medium">
+                            <span class="option-icon">⚖️</span>
+                            <span class="option-title">Умеренный</span>
+                            <span class="option-desc">1–3%</span>
+                        </div>
+                        <div class="option-card" data-value="high">
+                            <span class="option-icon">🔥</span>
+                            <span class="option-title">Агрессивный</span>
+                            <span class="option-desc">Более 3%</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="step-buttons">
                     <button type="button" class="prev-btn">← Назад</button>
-                    <button type="button" class="next-btn">Далее →</button>
+                    <button type="button" class="next-btn" disabled>Далее →</button>
                 </div>
             </div>
 
@@ -109,16 +157,16 @@
         </form>
 
         <div id="resultCard" class="result-card" style="display:none;">
-            <div class="result-icon" id="resultIcon">
-                <span class="icon-animated">📊</span>
-            </div>
+            <div class="result-icon" id="resultIcon"><span class="icon-animated">📊</span></div>
             <h2 id="resultType"></h2>
             <p id="resultRecommendation"></p>
             <button id="closeResultBtn" style="margin-top: 24px; width: auto; padding: 12px 28px;">✅ Понятно, закрыть</button>
         </div>
+
         <div id="formError" class="error-message"></div>
         <div class="progress-bar" id="progressBar" style="display:none;"><div class="progress-fill"></div></div>
     </div>
+
     <div class="tooltip-popup" id="tooltipPopup"></div>
     <script src="/webapp/static/script.js"></script>
 </body>
