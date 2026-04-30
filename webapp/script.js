@@ -8,7 +8,28 @@ const progressBar = document.getElementById('progressBar');
 const progressFill = progressBar.querySelector('.progress-fill');
 const closeResultBtn = document.getElementById('closeResultBtn');
 const progressSteps = document.querySelectorAll('.progress-step');
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = themeToggle?.querySelector('.theme-icon');
 
+// ====== ТЕМА ======
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (themeIcon) themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+    localStorage.setItem('quiz_theme', theme);
+}
+
+const savedTheme = localStorage.getItem('quiz_theme') || 'dark';
+applyTheme(savedTheme);
+
+if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'light' ? 'dark' : 'light';
+        applyTheme(next);
+    });
+}
+
+// ====== ПРОГРЕСС ШАГОВ ======
 function updateProgressSteps(step) {
     progressSteps.forEach((dot, index) => {
         dot.classList.remove('active', 'completed');
@@ -171,7 +192,41 @@ form.addEventListener('submit', async (e) => {
         else return goal === 'income' ? 'Профессионал' : 'Инвестор';
     }
 
-    const recommendations = {
+    // Расширенные рекомендации (ключ – тип, значение – массив советов)
+    const detailedAdvice = {
+        'Активный новичок': [
+            '📘 Изучите основы риск-менеджмента: никогда не рискуйте более 1% на сделку.',
+            '🔄 Начните с демо-счета, чтобы протестировать стратегию без потерь.',
+            '⏰ Выделите время на обучение: уделяйте хотя бы 20 минут в день анализу рынка.'
+        ],
+        'Осторожный старт': [
+            '🐢 Рассмотрите долгосрочные инвестиции в ETF и голубые фишки.',
+            '📊 Используйте фундаментальный анализ для выбора активов.',
+            '💰 Держите диверсифицированный портфель из 5-7 инструментов.'
+        ],
+        'Агрессивный трейдер': [
+            '🔥 Изучите маржинальную торговлю и кредитное плечо, но будьте осторожны.',
+            '📉 Освойте технический анализ: уровни поддержки/сопротивления, индикаторы.',
+            '🛡️ Установите строгие стоп-лоссы и не поддавайтесь эмоциям.'
+        ],
+        'Сбалансированный трейдер': [
+            '⚖️ Продолжайте вести дневник сделок для анализа успехов и ошибок.',
+            '🤖 Рассмотрите алгоритмическую торговлю для автоматизации рутины.',
+            '📈 Диверсифицируйте стратегии: комбинируйте свинг и внутридневную торговлю.'
+        ],
+        'Профессионал': [
+            '🏆 Вступайте в профессиональные трейдерские сообщества для обмена опытом.',
+            '📡 Подпишитесь на премиум-аналитику и сигналы от проверенных источников.',
+            '💼 Рассмотрите управление капиталом для частных инвесторов.'
+        ],
+        'Инвестор': [
+            '💵 Сформируйте портфель из акций, облигаций и недвижимости.',
+            '📅 Ребалансируйте портфель раз в квартал.',
+            '🌍 Изучите международные рынки для снижения страновых рисков.'
+        ]
+    };
+
+    const shortRecommendations = {
         'Активный новичок': 'Рекомендуем начать с демо-счета и изучить основы риск-менеджмента.',
         'Осторожный старт': 'Вам подойдут долгосрочные стратегии с низким риском.',
         'Агрессивный трейдер': 'Рассмотрите возможности маржинальной торговли и хеджирования.',
@@ -196,8 +251,19 @@ form.addEventListener('submit', async (e) => {
         const resultCard = document.getElementById('resultCard');
         resultCard.setAttribute('data-type', type);
         document.getElementById('resultType').textContent = type;
-        document.getElementById('resultRecommendation').textContent = recommendations[type] || '';
+        document.getElementById('resultRecommendation').textContent = shortRecommendations[type] || '';
         document.getElementById('resultIcon').innerHTML = `<span class="icon-animated">${icons[type]}</span>`;
+
+        // Детальные советы
+        const adviceContainer = document.getElementById('detailedAdvice');
+        adviceContainer.innerHTML = '';
+        const tips = detailedAdvice[type] || [];
+        tips.forEach(tip => {
+            const div = document.createElement('div');
+            div.className = 'advice-item';
+            div.textContent = tip;
+            adviceContainer.appendChild(div);
+        });
 
         form.style.display = 'none';
         resultCard.style.display = 'block';
