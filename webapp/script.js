@@ -163,6 +163,6 @@ form.addEventListener('submit', async (e) => {
         // Закрываем Mini App через 10 секунд, чтобы пользователь успел сделать скриншот
         setTimeout(() => {
             tg.close();
-        }, 10000);
+        }, 15000);
     }
 });
