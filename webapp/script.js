@@ -6,6 +6,7 @@ const submitBtn = document.getElementById('submitBtn');
 const errorDiv = document.getElementById('formError');
 const progressBar = document.getElementById('progressBar');
 const progressFill = progressBar.querySelector('.progress-fill');
+const closeResultBtn = document.getElementById('closeResultBtn');
 
 // Шаги
 let currentStep = 1;
@@ -29,6 +30,13 @@ document.querySelectorAll('.prev-btn').forEach(btn => {
     });
 });
 showStep(1);
+
+// Кнопка закрытия карточки результата (один раз за всё время)
+if (closeResultBtn) {
+    closeResultBtn.addEventListener('click', () => {
+        tg.close();
+    });
+}
 
 // Сохранение в localStorage
 function saveFormData() {
@@ -141,9 +149,6 @@ form.addEventListener('submit', async (e) => {
         // Скрываем форму и показываем карточку
         form.style.display = 'none';
         document.getElementById('resultCard').style.display = 'block';
-        document.getElementById('closeResultBtn').addEventListener('click', () => {
-    tg.close();
-});
         progressBar.style.display = 'none';
 
         // Отправляем данные на бэкенд в фоне
@@ -163,7 +168,7 @@ form.addEventListener('submit', async (e) => {
             console.error(err);
         }
 
-        // Закрываем Mini App через 10 секунд, чтобы пользователь успел сделать скриншот
+        // Закрываем Mini App через 15 секунд, чтобы пользователь успел сделать скриншот
         setTimeout(() => {
             tg.close();
         }, 15000);
