@@ -7,16 +7,23 @@ const errorDiv = document.getElementById('formError');
 const progressBar = document.getElementById('progressBar');
 const progressFill = progressBar.querySelector('.progress-fill');
 const closeResultBtn = document.getElementById('closeResultBtn');
+const progressSteps = document.querySelectorAll('.progress-step');
 
-// Шаги
+function updateProgressSteps(step) {
+    progressSteps.forEach((dot, index) => {
+        dot.classList.remove('active', 'completed');
+        if (index + 1 === step) dot.classList.add('active');
+        else if (index + 1 < step) dot.classList.add('completed');
+    });
+}
+
 let currentStep = 1;
 const steps = document.querySelectorAll('.step');
 
 function showStep(step) {
-    steps.forEach((s, idx) => {
-        s.classList.toggle('active', idx === step - 1);
-    });
+    steps.forEach((s, idx) => s.classList.toggle('active', idx === step - 1));
     currentStep = step;
+    updateProgressSteps(step);
 }
 
 document.querySelectorAll('.next-btn').forEach(btn => {
@@ -31,7 +38,40 @@ document.querySelectorAll('.prev-btn').forEach(btn => {
 });
 showStep(1);
 
-// Сохранение в localStorage
+// Подсказки
+const tooltipPopup = document.getElementById('tooltipPopup');
+document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = trigger.getAttribute('data-tooltip');
+        const rect = trigger.getBoundingClientRect();
+        tooltipPopup.textContent = text;
+        tooltipPopup.style.left = (rect.left + rect.width/2 - 80) + 'px';
+        tooltipPopup.style.top = (rect.bottom + 10) + 'px';
+        tooltipPopup.classList.add('visible');
+        setTimeout(() => tooltipPopup.classList.remove('visible'), 2000);
+    });
+});
+document.addEventListener('click', () => tooltipPopup.classList.remove('visible'));
+
+// Параллакс
+const labels = document.querySelectorAll('label');
+document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 10;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    labels.forEach(label => {
+        const emoji = label.querySelector('span.tooltip-trigger')?.previousSibling;
+        if (emoji && emoji.nodeType === 3 && emoji.textContent.trim()) {
+            const span = document.createElement('span');
+            span.textContent = emoji.textContent;
+            span.style.display = 'inline-block';
+            span.style.transform = `translate(${x}px, ${y}px)`;
+            span.style.transition = 'transform 0.1s ease-out';
+            emoji.replaceWith(span);
+        }
+    });
+});
+
 function saveFormData() {
     const data = {
         experience: form.experience.value,
@@ -59,7 +99,6 @@ function loadSavedData() {
 loadSavedData();
 form.addEventListener('input', saveFormData);
 
-// Валидация
 function validateForm() {
     const name = form.name.value.trim();
     const phone = form.phone.value.trim();
@@ -70,7 +109,6 @@ function validateForm() {
     return null;
 }
 
-// Отправка
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const err = validateForm();
@@ -92,27 +130,20 @@ form.addEventListener('submit', async (e) => {
             width = 100;
             clearInterval(interval);
             progressFill.style.width = '100%';
-            // Показываем результат с wow-эффектом
             showResult();
         } else {
             progressFill.style.width = width + '%';
         }
     }, 80);
 
-    // Определяем тип трейдера локально (та же логика, что в боте)
     function getType() {
         const exp = form.experience.value;
         const style = form.trading_style.value;
         const goal = form.goal.value;
         const risk = form.risk_level.value;
-
-        if (exp === 'beginner') {
-            return style === 'scalping' ? 'Активный новичок' : 'Осторожный старт';
-        } else if (exp === 'intermediate') {
-            return risk === 'high' ? 'Агрессивный трейдер' : 'Сбалансированный трейдер';
-        } else {
-            return goal === 'income' ? 'Профессионал' : 'Инвестор';
-        }
+        if (exp === 'beginner') return style === 'scalping' ? 'Активный новичок' : 'Осторожный старт';
+        else if (exp === 'intermediate') return risk === 'high' ? 'Агрессивный трейдер' : 'Сбалансированный трейдер';
+        else return goal === 'income' ? 'Профессионал' : 'Инвестор';
     }
 
     const recommendations = {
@@ -133,21 +164,21 @@ form.addEventListener('submit', async (e) => {
         'Инвестор': '💼'
     };
 
-    // Данные для отправки (сохраним в глобальную переменную, чтобы использовать позже)
     let pendingFormData = null;
 
     function showResult() {
         const type = getType();
+        const resultCard = document.getElementById('resultCard');
+        resultCard.setAttribute('data-type', type);
         document.getElementById('resultType').textContent = type;
         document.getElementById('resultRecommendation').textContent = recommendations[type] || '';
-        document.getElementById('resultIcon').textContent = icons[type] || '📊';
+        document.getElementById('resultIcon').innerHTML = `<span class="icon-animated">${icons[type]}</span>`;
 
-        // Скрываем форму и показываем карточку
         form.style.display = 'none';
-        document.getElementById('resultCard').style.display = 'block';
+        resultCard.style.display = 'block';
         progressBar.style.display = 'none';
+        document.getElementById('progressSteps').style.display = 'none';
 
-        // Подготавливаем данные, но НЕ отправляем их сейчас
         const name = form.name.value.trim();
         const phone = form.phone.value.trim();
         pendingFormData = {
@@ -160,15 +191,10 @@ form.addEventListener('submit', async (e) => {
         };
     }
 
-    // Кнопка "Понятно, закрыть" теперь отправляет данные и закрывает приложение
     if (closeResultBtn) {
         closeResultBtn.addEventListener('click', () => {
             if (pendingFormData) {
-                try {
-                    tg.sendData(JSON.stringify(pendingFormData));
-                } catch (err) {
-                    console.error(err);
-                }
+                try { tg.sendData(JSON.stringify(pendingFormData)); } catch (err) { console.error(err); }
             }
             tg.close();
         });
