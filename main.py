@@ -6,7 +6,7 @@ from aiohttp import web
 
 from config import BOT_TOKEN, ADMIN_IDS, CALENDAR_ID
 from database import Database
-# from google_calendar import GoogleCalendarManager  # если нужен календарь
+from google_sheets import append_quiz_result  # новый импорт для Google Sheets
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 db = Database()
-# calendar_manager = GoogleCalendarManager(CALENDAR_ID)  # при необходимости
 
-# ID экспертов (кому приходят уведомления о прохождении квиза)
 EXPERT_IDS = list(map(int, os.getenv("EXPERT_IDS", "").split(","))) if os.getenv("EXPERT_IDS") else []
 
 # ---------- Функция вычисления типа трейдера ----------
@@ -110,7 +108,7 @@ async def handle_web_app_data(message: types.Message):
         'result_type': result_type
     })
 
-    # Рекомендации в зависимости от типа
+    # Рекомендации (как в Mini App)
     recommendations = {
         'Активный новичок': 'Рекомендуем начать с демо-счета и изучить основы риск-менеджмента.',
         'Осторожный старт': 'Вам подойдут долгосрочные стратегии с низким риском.',
@@ -120,12 +118,29 @@ async def handle_web_app_data(message: types.Message):
         'Инвестор': 'Вам подойдут портфельные инвестиции с горизонтом от 1 года.'
     }
 
+    recommendation_text = recommendations.get(result_type, '')
+
+    # --- НОВОЕ: запись в Google Sheets (если настроено) ---
+    if os.getenv("GOOGLE_SHEETS_KEY"):
+        try:
+            append_quiz_result({
+                "name": name,
+                "phone": phone,
+                "experience": experience,
+                "trading_style": trading_style,
+                "goal": goal,
+                "risk_level": risk_level,
+                "result_type": result_type,
+                "recommendation": recommendation_text
+            })
+            logger.info(f"✅ Результат пользователя {name} записан в Google Sheets")
+        except Exception as e:
+            logger.error(f"❌ Ошибка записи в Google Sheets: {e}")
+
+    # Ответ пользователю
     msg_text = (f"✅ Спасибо, {name}!\n\n"
                 f"Ваш профиль трейдера: *{result_type}*\n\n"
-                f"📌 *Рекомендация:* {recommendations.get(result_type, '')}")
-
-    # Если подключён Google Calendar, предложим запись на консультацию
-    # (здесь можно добавить inline-кнопку с deep-link на календарь)
+                f"📌 *Рекомендация:* {recommendation_text}")
 
     await message.answer(msg_text, parse_mode="Markdown")
 
@@ -141,9 +156,8 @@ async def handle_web_app_data(message: types.Message):
         except Exception as e:
             logger.warning(f"Не удалось уведомить {admin_id}: {e}")
 
-# ---------- Эндпоинты API (для динамической подгрузки данных в Mini App, если нужно) ----------
+# ---------- Эндпоинты API ----------
 async def get_trader_types(request):
-    # Может возвращать список возможных типов для валидации на клиенте
     return web.json_response([
         'Активный новичок', 'Осторожный старт', 'Агрессивный трейдер',
         'Сбалансированный трейдер', 'Профессионал', 'Инвестор'
@@ -180,9 +194,6 @@ async def main():
     app.router.add_static('/webapp/static', path='webapp/', show_index=False)
     app.router.add_get('/trader_types', get_trader_types)
 
-    # Для админов можно добавить API для получения данных
-    # app.router.add_get('/api/quiz_results', get_quiz_results_api)
-
     port = int(os.environ.get("PORT", 8000))
     runner = web.AppRunner(app)
     await runner.setup()
@@ -193,9 +204,6 @@ async def main():
     webhook_url = f"https://quiz-funnel-bot.onrender.com/webhook"
     await bot.set_webhook(url=webhook_url)
     logger.info(f"✅ Вебхук установлен: {webhook_url}")
-
-    # Фоновая задача (например, напоминания о незавершённых квизах — можно добавить)
-    # asyncio.create_task(reminders_loop())
 
     while True:
         await asyncio.sleep(3600)
