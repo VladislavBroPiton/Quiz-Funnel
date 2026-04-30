@@ -9,7 +9,33 @@ from oauth2client.service_account import ServiceAccountCredentials
 logger = logging.getLogger(__name__)
 
 SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID", "ваш_дефолтный_sheet_id")
-WORKSHEET_NAME = "Quiz"   # можешь поменять на любое удобное имя
+WORKSHEET_NAME = "Quiz"
+
+# Словари перевода значений на русский
+EXPERIENCE_MAP = {
+    "beginner": "Новичок",
+    "intermediate": "Продвинутый",
+    "experienced": "Профессионал"
+}
+
+TRADING_STYLE_MAP = {
+    "scalping": "Скальпинг",
+    "day_trading": "Дейтрейдинг",
+    "swing": "Свинг",
+    "long_term": "Долгосрочные инвестиции"
+}
+
+GOAL_MAP = {
+    "income": "Стабильный доход",
+    "growth": "Рост капитала",
+    "speculation": "Спекуляция"
+}
+
+RISK_LEVEL_MAP = {
+    "low": "Консервативный (до 1%)",
+    "medium": "Умеренный (1-3%)",
+    "high": "Агрессивный (более 3%)"
+}
 
 def _get_google_client():
     creds_json = os.getenv("GOOGLE_SHEETS_KEY")
@@ -42,18 +68,19 @@ def append_quiz_result(data: dict):
         except gspread.WorksheetNotFound:
             logger.info(f"Лист '{WORKSHEET_NAME}' не найден, создаю новый...")
             sheet = spreadsheet.add_worksheet(WORKSHEET_NAME, rows="1000", cols="20")
-            # Добавляем заголовки (опционально, если лист был только что создан)
+            # Добавляем заголовки
             headers = ["Дата", "Имя", "Телефон", "Опыт", "Стиль", "Цель", "Риск", "Тип трейдера", "Рекомендация"]
             sheet.append_row(headers, value_input_option="USER_ENTERED")
 
+        # Переводим значения на русский
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             data.get("name", ""),
             data.get("phone", ""),
-            data.get("experience", ""),
-            data.get("trading_style", ""),
-            data.get("goal", ""),
-            data.get("risk_level", ""),
+            EXPERIENCE_MAP.get(data.get("experience", ""), data.get("experience", "")),
+            TRADING_STYLE_MAP.get(data.get("trading_style", ""), data.get("trading_style", "")),
+            GOAL_MAP.get(data.get("goal", ""), data.get("goal", "")),
+            RISK_LEVEL_MAP.get(data.get("risk_level", ""), data.get("risk_level", "")),
             data.get("result_type", ""),
             data.get("recommendation", "")
         ]
