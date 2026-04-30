@@ -17,11 +17,20 @@
         </div>
         <div class="subtitle">УЗНАЙ СВОЙ ПРОФИЛЬ ТРЕЙДЕРА</div>
 
+        <!-- Индикатор шагов -->
+        <div class="progress-steps" id="progressSteps">
+            <span class="progress-step active" data-step="1"></span>
+            <span class="progress-step" data-step="2"></span>
+            <span class="progress-step" data-step="3"></span>
+            <span class="progress-step" data-step="4"></span>
+            <span class="progress-step" data-step="5"></span>
+        </div>
+
         <form id="quizForm">
             <!-- Шаг 1: Опыт -->
             <div class="step step-1 active">
                 <div class="form-group">
-                    <label>📈 Ваш опыт в трейдинге</label>
+                    <label>📈 Ваш опыт в трейдинге <span class="tooltip-trigger" data-tooltip="Выберите, насколько вы знакомы с рынком">?</span></label>
                     <select name="experience" required>
                         <option value="beginner">👶 Новичок (меньше года)</option>
                         <option value="intermediate">🧑 Продвинутый (1-3 года)</option>
@@ -36,7 +45,7 @@
             <!-- Шаг 2: Стиль торговли -->
             <div class="step step-2">
                 <div class="form-group">
-                    <label>⚡ Предпочитаемый стиль</label>
+                    <label>⚡ Предпочитаемый стиль <span class="tooltip-trigger" data-tooltip="Стиль определяет, как часто вы открываете сделки">?</span></label>
                     <select name="trading_style" required>
                         <option value="scalping">Скальпинг (быстрые сделки)</option>
                         <option value="day_trading">Дейтрейдинг (внутри дня)</option>
@@ -53,7 +62,7 @@
             <!-- Шаг 3: Цели -->
             <div class="step step-3">
                 <div class="form-group">
-                    <label>🎯 Ваша главная цель</label>
+                    <label>🎯 Ваша главная цель <span class="tooltip-trigger" data-tooltip="Чего вы хотите достичь в трейдинге в первую очередь">?</span></label>
                     <select name="goal" required>
                         <option value="income">Стабильный доход</option>
                         <option value="growth">Рост капитала</option>
@@ -69,7 +78,7 @@
             <!-- Шаг 4: Отношение к риску -->
             <div class="step step-4">
                 <div class="form-group">
-                    <label>⚠️ Допустимый риск на сделку</label>
+                    <label>⚠️ Допустимый риск на сделку <span class="tooltip-trigger" data-tooltip="Процент капитала, которым вы готовы рискнуть в одной сделке">?</span></label>
                     <select name="risk_level" required>
                         <option value="low">До 1%</option>
                         <option value="medium">1-3%</option>
@@ -100,14 +109,17 @@
         </form>
 
         <div id="resultCard" class="result-card" style="display:none;">
-    <div class="result-icon" id="resultIcon">📊</div>
-    <h2 id="resultType"></h2>
-    <p id="resultRecommendation"></p>
-    <button id="closeResultBtn" style="margin-top: 24px; width: auto; padding: 12px 28px;">✅ Понятно, закрыть</button>
-</div>
+            <div class="result-icon" id="resultIcon">
+                <span class="icon-animated">📊</span>
+            </div>
+            <h2 id="resultType"></h2>
+            <p id="resultRecommendation"></p>
+            <button id="closeResultBtn" style="margin-top: 24px; width: auto; padding: 12px 28px;">✅ Понятно, закрыть</button>
+        </div>
         <div id="formError" class="error-message"></div>
         <div class="progress-bar" id="progressBar" style="display:none;"><div class="progress-fill"></div></div>
     </div>
+    <div class="tooltip-popup" id="tooltipPopup"></div>
     <script src="/webapp/static/script.js"></script>
 </body>
 </html>
