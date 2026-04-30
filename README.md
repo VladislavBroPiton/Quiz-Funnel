@@ -73,6 +73,4 @@
 | Деплой | Render, CronJob |
 | Шрифты | Inter, Google Fonts |
 
----
 
-## 📁 Структура проекта
