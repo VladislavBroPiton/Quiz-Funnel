@@ -8,15 +8,10 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 logger = logging.getLogger(__name__)
 
-# ID вашей Google таблицы
 SPREADSHEET_ID = os.getenv("GOOGLE_SHEET_ID", "ваш_дефолтный_sheet_id")
-# Название листа, куда будем записывать данные (по умолчанию sheet1)
-WORKSHEET_NAME = "Sheet1"
+WORKSHEET_NAME = "Sheet1"   # можешь поменять на любое удобное имя
 
 def _get_google_client():
-    """
-    Создаёт и возвращает авторизованный клиент gspread.
-    """
     creds_json = os.getenv("GOOGLE_SHEETS_KEY")
     if not creds_json:
         raise ValueError("❌ Переменная окружения GOOGLE_SHEETS_KEY не задана.")
@@ -37,16 +32,20 @@ def _get_google_client():
         raise
 
 def append_quiz_result(data: dict):
-    """
-    Добавляет одну строку с результатами квиза в Google Sheets.
-    Ожидает словарь data с ключами:
-    name, phone, experience, trading_style, goal, risk_level, result_type, recommendation
-    """
     try:
         client = _get_google_client()
-        sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
         
-        # Формируем строку для добавления (порядок должен совпадать с заголовками)
+        # Проверяем, существует ли нужный лист, и создаём при необходимости
+        try:
+            sheet = spreadsheet.worksheet(WORKSHEET_NAME)
+        except gspread.WorksheetNotFound:
+            logger.info(f"Лист '{WORKSHEET_NAME}' не найден, создаю новый...")
+            sheet = spreadsheet.add_worksheet(WORKSHEET_NAME, rows="1000", cols="20")
+            # Добавляем заголовки (опционально, если лист был только что создан)
+            headers = ["Дата", "Имя", "Телефон", "Опыт", "Стиль", "Цель", "Риск", "Тип трейдера", "Рекомендация"]
+            sheet.append_row(headers, value_input_option="USER_ENTERED")
+
         row = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             data.get("name", ""),
@@ -58,7 +57,6 @@ def append_quiz_result(data: dict):
             data.get("result_type", ""),
             data.get("recommendation", "")
         ]
-        
         sheet.append_row(row, value_input_option="USER_ENTERED")
         logger.info(f"✅ Данные квиза добавлены в Google Sheets: {data.get('name')}")
         return True
